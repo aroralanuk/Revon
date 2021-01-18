@@ -1,6 +1,6 @@
-# Music-Controller-Web-App-Tutorial
+# Revon
 
-The code for Tech With Tim's "Django & React Full Stack Web App Tutorial" series.
+The music syncing web app
 
 ## Setup Instructions
 
@@ -11,13 +11,7 @@ pip install -r requirements.txt
 ```
 ### Start Web Server
 
-To start the web server you need to run the following sequence of commands.
-
-First cd into your desired tutorial folder (replace x with tutorial number).
-```bash 
-cd "Tutorial x"
-```
-Next run the django web server.
+To start the web server you need to run the following.
 ```bash
 python manage.py runserver
 ```

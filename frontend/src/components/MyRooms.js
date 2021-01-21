@@ -1,146 +1,96 @@
 import React, { Component } from "react";
 import { Grid, Button, Typography } from "@material-ui/core";
-import CreateRoomPage from "./CreateRoomPage";
-import MusicPlayer from "./MusicPlayer";
+// import CreateRoomPage from "./CreateRoomPage";
+// import MusicPlayer from "./MusicPlayer";
+import Axios from 'axios'
+import {useState,useEffect} from 'react';
 
-export default class MyRooms extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      rooms: [], 
-    };
+// const useStyles = makeStyles((theme) => ({
+//   root: {
+//     flexGrow: 1
+//   },
+//   paper: {
+//     height: 140,
+//     width: 100
+//   },
+//   control: {
+//     padding: theme.spacing(2)
+//   }
+// }));
 
-    this.getMyRoomsDetails = this.getMyRoomsDetails.bind(this);
-    this.getRoomDetails();
+export default function MyRooms() {
+  const [rooms, setRooms] = useState([])
+  useEffect(() => {
+    fetchRooms();
+  }, [])
+  useEffect(() => {
+    console.log(rooms)
+  }, [rooms])
+  const fetchRooms=async()=>{
+    const response=await Axios("/api/my-rooms");
+    setRooms(response.data)    
   }
+  return (
+    <Grid container className="MyRooms">
+      {
+        rooms && rooms.map(room=>{
+          return(
+            <Grid item align="center" xs={8}>
+              <Typography component="h5" variant="h5">
+                {room.code}
+              </Typography>
+              <Typography color="textSecondary" variant="subtitle1">
+                {room.host}
+              </Typography>
+            </Grid>
+          )
 
-  async componentDidMount() {
-    const rooms = await this.getMyRoomsDetails();
-    this.setState({ rooms });
-  }
+        })
+      }
+    </Grid>
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
+  );
+}
 
-  getMyRoomsDetails() {
-    return fetch("/api/my-rooms")
-      .then((response) => response.json);
-
-  }
-
-  authenticateSpotify() {
-    fetch("/spotify/is-authenticated")
-      .then((response) => response.json())
-      .then((data) => {
-        this.setState({ spotifyAuthenticated: data.status });
-        console.log(data.status);
-        if (!data.status) {
-          fetch("/spotify/get-auth-url")
-            .then((response) => response.json())
-            .then((data) => {
-              window.location.replace(data.url);
-            });
-        }
-      });
-  }
-
-//   getCurrentSong() {
-//     fetch("/spotify/current-song")
-//       .then((response) => {
-//         if (!response.ok) {
-//           return {};
-//         } else {
-//           return response.json();
-//         }
-//       })
+//   authenticateSpotify() {
+//     fetch("/spotify/is-authenticated")
+//       .then((response) => response.json())
 //       .then((data) => {
-//         this.setState({ song: data });
-//         console.log(data);
+//         this.setState({ spotifyAuthenticated: data.status });
+//         console.log(data.status);
+//         if (!data.status) {
+//           fetch("/spotify/get-auth-url")
+//             .then((response) => response.json())
+//             .then((data) => {
+//               window.location.replace(data.url);
+//             });
+//         }
 //       });
 //   }
 
-  leaveButtonPressed() {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    };
-    fetch("/api/leave-room", requestOptions).then((_response) => {
-      this.props.leaveRoomCallback();
-      this.props.history.push("/");
-    });
-  }
 
-  updateShowSettings(value) {
-    this.setState({
-      showSettings: value,
-    });
-  }
+// import React from "react";
+// import { makeStyles } from "@material-ui/core/styles";
 
-  renderSettings() {
-    return (
-      <Grid container spacing={1}>
-        <Grid item xs={12} align="center">
-          <CreateRoomPage
-            update={true}
-            votesToSkip={this.state.votesToSkip}
-            guestCanPause={this.state.guestCanPause}
-            roomCode={this.roomCode}
-            updateCallback={this.getRoomDetails}
-          />
-        </Grid>
-        <Grid item xs={12} align="center">
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => this.updateShowSettings(false)}
-          >
-            Close
-          </Button>
-        </Grid>
-      </Grid>
-    );
-  }
+// export default function MyRooms() {
+//   const [spacing, setSpacing] = React.useState(2);
+//   const classes = useStyles();
 
-  renderSettingsButton() {
-    return (
-      <Grid item xs={12} align="center">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => this.updateShowSettings(true)}
-        >
-          Settings
-        </Button>
-      </Grid>
-    );
-  }
+//   const handleChange = (event) => {
+//     setSpacing(Number(event.target.value));
+//   };
 
-  
-
-  render() {
-    if (this.state.showSettings) {
-      return this.renderSettings();
-    }
-    return (
-      <Grid container spacing={1}>
-        <Grid item xs={12} align="center">
-          <Typography variant="h4" component="h4">
-            Code: {this.roomCode}
-          </Typography>
-        </Grid>
-        <MusicPlayer {...this.state.song} />
-        {this.state.isHost ? this.renderSettingsButton() : null}
-        <Grid item xs={12} align="center">
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={this.leaveButtonPressed}
-          >
-            Leave Room
-          </Button>
-        </Grid>
-      </Grid>
-    );
-  }
-}
+//   return (
+//     <Grid container className={classes.root} spacing={2}>
+//       <Grid item xs={12}>
+//         <Grid container justify="center" spacing={spacing}>
+//           {[0, 1, 2, 3, 4, 5, 6].map((value) => (
+//             <Grid key={value} item>
+//               <Paper className={classes.paper} />
+//             </Grid>
+//           ))}
+//         </Grid>
+//       </Grid>
+//     </Grid>
+//   );
+// }

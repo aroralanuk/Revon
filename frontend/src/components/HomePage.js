@@ -11,6 +11,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import Info from './Info'
+import MyRooms from './MyRooms'
 
 export default class HomePage extends Component {
   constructor(props) {
@@ -80,6 +81,7 @@ export default class HomePage extends Component {
           <Route path="/join" component={RoomJoinPage} />
           <Route path="/info" component={Info} />
           <Route path="/create" component={CreateRoomPage} />
+          <Route path="/my-rooms" component={MyRooms} />
           <Route
             path="/room/:roomCode"
             render={(props) => {

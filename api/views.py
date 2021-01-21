@@ -39,7 +39,7 @@ class GetMyRooms(generics.ListAPIView):
         room_codes = self.request.session.get('rooms', [])
         queryset = Room.objects.filter(code__in=room_codes)
         for q in queryset:
-            print(q)
+            print(q.code)
         return queryset
 
 

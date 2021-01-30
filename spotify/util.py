@@ -5,8 +5,8 @@ from .credentials import CLIENT_ID, CLIENT_SECRET
 from requests import post, put, get
 
 
-BASE_URL = "https://api.spotify.com/v1/me/"
-
+BASE_URL = "https://api.spotify.com/v1/"
+BASE_ME_URL = BASE_URL + "me/"
 
 def get_user_tokens(session_id):
     user_tokens = SpotifyToken.objects.filter(user=session_id)
@@ -65,16 +65,21 @@ def refresh_spotify_token(session_id):
 
 
 def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
+    refresh_spotify_token(session_id)
+
     tokens = get_user_tokens(session_id)
     headers = {'Content-Type': 'application/json',
                'Authorization': "Bearer " + tokens.access_token}
 
     if post_:
-        post(BASE_URL + endpoint, headers=headers)
+        post(BASE_ME_URL + endpoint, headers=headers)
     if put_:
-        put(BASE_URL + endpoint, headers=headers)
+        put(BASE_ME_URL + endpoint, headers=headers)
+    if 'tracks' in endpoint:
+        response = get(BASE_URL + endpoint, {}, headers=headers)
+    else:
+        response = get(BASE_ME_URL + endpoint, {}, headers=headers)
 
-    response = get(BASE_URL + endpoint, {}, headers=headers)
     try:
         return response.json()
     except:

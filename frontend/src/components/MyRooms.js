@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Grid, Button, Typography } from "@material-ui/core";
+import { Grid, Button, Typography, Card,Fab } from "@material-ui/core";
+import AddIcon from '@material-ui/icons/Add';
 // import CreateRoomPage from "./CreateRoomPage";
 // import MusicPlayer from "./MusicPlayer";
 import Axios from 'axios'
@@ -18,6 +19,15 @@ import {useState,useEffect} from 'react';
 //   }
 // }));
 
+const styles = theme => ({
+  fab: {
+    // margin: theme.spacing.unit, // You might not need this now
+    position: "fixed",
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+  },
+});
+
 export default function MyRooms() {
   const [rooms, setRooms] = useState([])
   useEffect(() => {
@@ -35,19 +45,39 @@ export default function MyRooms() {
       {
         rooms && rooms.map(room=>{
           return(
-            <Grid item align="center" xs={8}>
-              <Typography component="h5" variant="h5">
-                {room.code}
-              </Typography>
-              <Typography color="textSecondary" variant="subtitle1">
-                {room.host}
-              </Typography>
-            </Grid>
-          )
 
+
+            <Card>
+              <Grid container alignItems="center">
+                <Grid item align="center" xs={4}>
+                  <img src={room.song_album_cover} height="100%" width="100%" />
+                </Grid>
+                <Grid item align="center" xs={8}>
+                  <Typography component="h5" variant="h5">
+                    Room code : {room.code}
+                  </Typography>
+                  <Typography color="textSecondary" variant="subtitle1">
+                    Currently playing: {room.song_title}
+                  </Typography>
+                  <Typography color="textSecondary" variant="subtitle1">
+                  by {room.song_artists}
+                </Typography>
+                </Grid>
+              </Grid>
+            </Card>
+          );
+          
         })
       }
+      {
+        <Fab color="primary" aria-label="Add" styles={styles.fab}>
+          <AddIcon />
+        </Fab>
+      }
     </Grid>
+    // <Grid container spacing={3}>
+    //   
+    // </Grid>
 
   );
 }

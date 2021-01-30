@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
 from django.http import JsonResponse
-from spotify.views import CurrentSong
+from spotify.views import GetSong
 
 # Create your views here.
 
@@ -36,20 +36,26 @@ class GetMyRooms(generics.ListAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
 
-    def get_queryset(self):
+    def get(self, request):
         room_codes = self.request.session.get('rooms', [])
         queryset = Room.objects.filter(code__in=room_codes)
         # res = self.paginate_queryset(queryset)
 
         serializer_value = RoomSerializer(queryset,many=True,context={'request': self.request}).data
-        
-        song_info = CurrentSong.as_view()(request=self.request._request).data
-        for i in serializer_value:
-            i['sex'] = 'male'
+
+        for room in serializer_value:
+            song_id = room['current_song']
+            print(song_id)
+            song_info = GetSong.as_view()(request=self.request._request,song_id=song_id).data
+            print(song_info)
+            room['song_title'] = song_info.get('title')
+            room['song_artists'] = song_info.get('artist')
+            room['song_album_cover'] = song_info.get('image_url')
+
         print(serializer_value)
-        print(song_info)
-        print(queryset)
-        return queryset
+        for skin in queryset:
+            print(skin)
+        return Response(serializer_value, status=status.HTTP_200_OK)
 
 
 class JoinRoom(APIView):

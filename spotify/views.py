@@ -111,6 +111,50 @@ class CurrentSong(APIView):
             room.save(update_fields=['current_song'])
             votes = Vote.objects.filter(room=room).delete()
 
+class GetSong(APIView):
+    def get(self, response, song_id, format=None):
+        endpoint = 'tracks/' + song_id
+        # print(song_id)
+        host = self.request.session.session_key
+        response = execute_spotify_api_request(host, endpoint)
+
+        if 'error' in response or 'album' not in response:
+            print(response)
+            return Response({'message':'invalid id'}, status=status.HTTP_204_NO_CONTENT)
+
+        item = response.get('album')
+        title = item.get('name')
+        # duration = item.get('duration_ms')
+        # progress = response.get('progress_ms')
+        album_cover = item.get('images')[0].get('url')
+        # is_playing = response.get('is_playing')
+        # song_id = item.get('id')
+
+        artist_string = ""
+
+        for i, artist in enumerate(item.get('artists')):
+            if i > 0:
+                artist_string += ", "
+            name = artist.get('name')
+            artist_string += name
+
+        # votes = len(Vote.objects.filter(room=room, song_id=song_id))
+
+        song = {
+            'title': item.get('name'),
+            'artist': artist_string,
+            # 'duration': duration,
+            # 'time': progress,
+            'image_url': album_cover,
+            # 'is_playing': is_playing,
+            # 'votes': votes,
+            # 'votes_required': room.votes_to_skip,
+            # 'id': song_id
+        }
+        # self.update_room_song(room, song_id)
+        # print(song)
+        return Response(song, status=status.HTTP_200_OK)
+
 class PauseSong(APIView):
     def put(self, response, format=None):
         room_code = self.request.session.get('room_code')
